@@ -1,5 +1,4 @@
 const express = require("express");
-const { nanoid } = require("nanoid");
 const { validationBody } = require("../../middleware/validationBody");
 const {
   schemaPostContact,
@@ -11,7 +10,8 @@ const actions = require("../../models/contacts.js");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  res.json(await actions.listContacts());
+  const contacts = await actions.listContacts();
+  res.json(contacts);
 });
 
 router.get("/:contactId", async (req, res) => {
@@ -24,16 +24,9 @@ router.get("/:contactId", async (req, res) => {
 });
 
 router.post("/", validationBody(schemaPostContact), async (req, res, next) => {
-  const { name, email, phone } = req.body;
-  const id = nanoid();
-  const newContact = {
-    id,
-    name,
-    email,
-    phone,
-  };
-  await actions.addContact(newContact);
-  res.status(201).json(newContact);
+  const newContactCredentials = req.body;
+  const addedContact = await actions.addContact(newContactCredentials);
+  res.status(201).json(addedContact);
 });
 
 router.delete("/:contactId", async (req, res) => {
@@ -49,13 +42,8 @@ router.put(
   "/:contactId",
   validationBody(schemaPutContact),
   async (req, res) => {
-    const { name, email, phone } = req.body;
+    const bodyForUpdate = req.body;
     const contactId = req.params.contactId;
-    const bodyForUpdate = {
-      name,
-      email,
-      phone,
-    };
     const updatedContact = await actions.updateContact(
       contactId,
       bodyForUpdate
