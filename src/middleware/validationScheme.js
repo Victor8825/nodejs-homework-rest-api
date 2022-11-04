@@ -12,7 +12,12 @@ const schemaPutContact = Joi.object({
   phone: Joi.string().optional(),
 });
 
+const schemaPatchContact = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
 module.exports = {
   schemaPostContact,
   schemaPutContact,
+  schemaPatchContact,
 };
