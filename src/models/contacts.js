@@ -1,7 +1,13 @@
 const Contact = require("../db/contactModel");
 
-const getContacts = async () => {
-  const contacts = await await Contact.find();
+const getContacts = async (page, limit, userId, favorite) => {
+  const searchParams =
+    favorite === null
+      ? { owner: userId }
+      : { owner: userId, favorite: favorite };
+
+  const skip = (page - 1) * limit;
+  const contacts = await Contact.find(searchParams).skip(skip).limit(limit);
   return contacts;
 };
 
@@ -14,9 +20,15 @@ const getContactById = async (contactId) => {
   }
 };
 
-const addContact = async ({ name, email, phone, favorite = false }) => {
+const addContact = async ({ name, email, phone, favorite = false }, userId) => {
   try {
-    const newContact = await Contact.create({ name, email, phone, favorite });
+    const newContact = await Contact.create({
+      name,
+      email,
+      phone,
+      favorite,
+      owner: userId,
+    });
     return newContact;
   } catch (err) {
     console.log(err);
