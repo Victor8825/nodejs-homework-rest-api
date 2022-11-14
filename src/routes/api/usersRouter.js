@@ -4,6 +4,7 @@ const { asyncWrapper } = require("../../helpers/apiHelpers");
 const { validationBody } = require("../../middleware/validationBody");
 const {
   joiUserValidationSchema,
+  joiUserSubscriptionUpdateValidationSchema,
 } = require("../../middleware/userValidationSchema");
 
 const {
@@ -37,6 +38,7 @@ router.get("/current", authorizationCheck, asyncWrapper(currentUserController));
 router.patch(
   "/",
   authorizationCheck,
+  validationBody(joiUserSubscriptionUpdateValidationSchema),
   asyncWrapper(updateUserSubscriptionController)
 );
 
