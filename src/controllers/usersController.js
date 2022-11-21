@@ -5,6 +5,7 @@ const {
   userLogin,
   userLogout,
   updateUserSubscription,
+  updateAvatar,
 } = require("../models/users");
 
 const userSignupController = async (req, res) => {
@@ -64,10 +65,22 @@ const updateUserSubscriptionController = async (req, res) => {
   }
 };
 
+const updateAvatarController = async (req, res) => {
+  const { path: tmpFilePath, originalname } = req.file;
+  const { _id: id } = req.user;
+  const updatedAvatar = await updateAvatar(tmpFilePath, originalname, id);
+  if (!updatedAvatar) {
+    throw requestError(401, "Not authorized");
+  } else {
+    res.status(200).json(`avatarURL : ${updatedAvatar.avatarURL}`);
+  }
+};
+
 module.exports = {
   userSignupController,
   userLoginController,
   currentUserController,
   userLogoutController,
   updateUserSubscriptionController,
+  updateAvatarController,
 };

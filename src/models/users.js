@@ -1,6 +1,8 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
+const fs = require("fs/promises");
+const path = require("path");
+const Jimp = require("jimp");
 const User = require("../db/userModel");
 
 const userRegistration = async ({ email, password }) => {
@@ -46,9 +48,36 @@ const updateUserSubscription = async (userId, field) => {
   }
 };
 
+const updateAvatar = async (tmpFilePath, originalname, id) => {
+  try {
+    const imageName = `${id}_${originalname}`;
+    const targetFilePath = path.join(
+      process.cwd(),
+      "src/public/avatars",
+      imageName
+    );
+    const file = await Jimp.read(tmpFilePath);
+    file.resize(250, 250).write(tmpFilePath);
+    await fs.rename(tmpFilePath, targetFilePath);
+    const avatarURL = path.join("public", "avatars", imageName);
+    const updatedAvatar = await User.findByIdAndUpdate(
+      id,
+      { avatarURL },
+      {
+        new: true,
+      }
+    );
+    return updatedAvatar;
+  } catch (error) {
+    await fs.unlink(tmpFilePath);
+    console.log(error);
+  }
+};
+
 module.exports = {
   userRegistration,
   userLogin,
   userLogout,
   updateUserSubscription,
+  updateAvatar,
 };
