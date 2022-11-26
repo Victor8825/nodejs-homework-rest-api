@@ -7,6 +7,7 @@ const { upload } = require("../../middleware/uploadImage");
 const {
   joiUserValidationSchema,
   joiUserSubscriptionUpdateValidationSchema,
+  joiUserVerificationSchema,
 } = require("../../middleware/userValidationSchema");
 
 const {
@@ -16,6 +17,8 @@ const {
   userLogoutController,
   updateUserSubscriptionController,
   updateAvatarController,
+  userVerificationController,
+  checkUserVerificationController,
 } = require("../../controllers/usersController");
 
 const authorizationCheck = require("../../middleware/auth");
@@ -50,6 +53,17 @@ router.patch(
   authorizationCheck,
   upload.single("avatar"),
   asyncWrapper(updateAvatarController)
+);
+
+router.get(
+  "/auth/verify/:verificationToken",
+  asyncWrapper(userVerificationController)
+);
+
+router.post(
+  "/auth/verify",
+  validationBody(joiUserVerificationSchema),
+  asyncWrapper(checkUserVerificationController)
 );
 
 module.exports = router;

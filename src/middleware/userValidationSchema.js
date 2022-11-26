@@ -9,7 +9,12 @@ const joiUserSubscriptionUpdateValidationSchema = Joi.object({
   subscription: Joi.string().valid("starter", "pro", "business").required(),
 });
 
+const joiUserVerificationSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
 module.exports = {
   joiUserValidationSchema,
   joiUserSubscriptionUpdateValidationSchema,
+  joiUserVerificationSchema,
 };

@@ -6,6 +6,8 @@ const {
   userLogout,
   updateUserSubscription,
   updateAvatar,
+  userVerification,
+  checkUserVerification,
 } = require("../models/users");
 
 const userSignupController = async (req, res) => {
@@ -18,6 +20,7 @@ const userSignupController = async (req, res) => {
     user: {
       email: user.email,
       subscription: "starter",
+      verificationToken: user.verificationToken,
     },
   });
 };
@@ -26,7 +29,10 @@ const userLoginController = async (req, res) => {
   const userCredentials = req.body;
   const user = await userLogin(userCredentials);
   if (!user) {
-    throw requestError(401, "email or password is wrong");
+    throw requestError(
+      401,
+      "email is wrong or not verified or password is wrong"
+    );
   }
   res.status(200).json(user);
 };
@@ -76,6 +82,27 @@ const updateAvatarController = async (req, res) => {
   }
 };
 
+const userVerificationController = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await userVerification(verificationToken);
+  user
+    ? res.status(200).json({ message: "Verification succesful" })
+    : res.status(404).json({ message: "Not found" });
+};
+
+const checkUserVerificationController = async (req, res) => {
+  const { email } = req.body;
+  const user = await checkUserVerification(email);
+  user
+    ? res.status(200).json({ message: "Verification email sent" })
+    : res
+        .status(400)
+        .json({
+          message:
+            "Verification has already been passed or there is no such a user in DB",
+        });
+};
+
 module.exports = {
   userSignupController,
   userLoginController,
@@ -83,4 +110,6 @@ module.exports = {
   userLogoutController,
   updateUserSubscriptionController,
   updateAvatarController,
+  userVerificationController,
+  checkUserVerificationController,
 };
